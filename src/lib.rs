@@ -23,13 +23,13 @@ macro_rules! python {
     };
 }
 
-pub struct py_context {
+pub struct PyContext {
     pub variables: py_var
 }
 
-impl Default for py_context {
+impl Default for PyContext {
     fn default() -> Self {
-        py_context { variables: Default::default() }
+        PyContext { variables: Default::default() }
     }
 }
 
@@ -49,9 +49,9 @@ impl Default for py_var {
 
 pub struct SingleGen<T>(T);
 
-impl py_context {
-    pub fn new() -> py_context {
-        py_context { ..Default::default() }
+impl PyContext {
+    pub fn new() -> PyContext {
+        PyContext { ..Default::default() }
     }
 
     pub fn run(&self, input: &'static str) {
