@@ -1,6 +1,6 @@
 mod lib;
 
-use crate::lib::{execute_python, py_vars};
+use crate::lib::*;
 
 #[macro_export]
 macro_rules! py_run {
@@ -22,10 +22,14 @@ macro_rules! python_string {
 }
 
 fn main() {
-    let py_vars = py_vars { ..Default::default() };
+    let py_vars = py_context { ..Default::default() };
 
-    python_string! {&py_vars,
+    python_string! {Some(&py_vars),
         "x = 2
 print(x)"
     };
+
+    python_string!{Some(&py_vars),
+        "print(x)"
+    }
 }
