@@ -9,3 +9,17 @@ fn main() {
     };
 }
 ```
+
+```rust
+fn main() {
+    let py_vars = py_context { ..Default::default() };
+
+    python_string! {Some(&py_vars),
+        r#"
+def hi():
+    print("Hello world!")
+
+hi()
+        "#
+    };
+}```

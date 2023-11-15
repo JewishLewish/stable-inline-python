@@ -3,12 +3,41 @@ use std::default;
 use pyo3::{prelude::*, types::PyDict};
 
 
+#[macro_export]
+macro_rules! py_run {
+    ($py_vars:expr, $($code:tt)*) => {
+        {
+            println!("{:?}",$($code)*);
+            let code_str = stringify!($($code)*);
+            let _ = execute_python($py_vars, code_str);
+        }
+    };
+}
+
+macro_rules! python_string {
+    ($py_vars:expr, $code:expr) => {
+        {
+            let _ = execute_python($py_vars, $code);
+        }
+    };
+}
 
 pub struct py_context {
-    pub locals: Py<PyDict>
+    pub variables: py_var
 }
 
 impl Default for py_context {
+    fn default() -> Self {
+        py_context { variables: Default::default() }
+    }
+}
+
+
+pub struct py_var {
+    pub locals: Py<PyDict>
+}
+
+impl Default for py_var {
     fn default() -> Self {
         pyo3::prepare_freethreaded_python();
         Python::with_gil(|py| {
@@ -17,9 +46,19 @@ impl Default for py_context {
     }
 }
 
+impl py_context {
+    fn new() -> py_context {
+        py_context { ..Default::default() }
+    }
+
+    fn run(&self, input: &'static str) -> PyResult<()> {
+        execute_python(Some(&self.variables), input)
+    }
+}
 
 
-pub fn execute_python(py_vars: Option<&py_context>, input: &'static str) -> PyResult<()> {
+
+pub fn execute_python(py_vars: Option<&py_var>, input: &'static str) -> PyResult<()> {
     pyo3::prepare_freethreaded_python();
 
     Python::with_gil(|py| {
@@ -37,7 +76,7 @@ pub fn execute_python(py_vars: Option<&py_context>, input: &'static str) -> PyRe
     Ok(())
 }
 
-fn _define<'a>(py_vars: Option<&'a py_context>, py: Python<'a>) -> &'a PyDict {
+fn _define<'a>(py_vars: Option<&'a py_var>, py: Python<'a>) -> &'a PyDict {
     if py_vars.is_none() {
         PyDict::new(py).into()
     } else {
