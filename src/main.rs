@@ -6,8 +6,17 @@ use crate::lib::{execute_python, py_vars};
 macro_rules! py_run {
     ($py_vars:expr, $($code:tt)*) => {
         {
+            println!("{:?}",$($code)*);
             let code_str = stringify!($($code)*);
             let _ = execute_python($py_vars, code_str);
+        }
+    };
+}
+
+macro_rules! python_string {
+    ($py_vars:expr, $code:expr) => {
+        {
+            let _ = execute_python($py_vars, $code);
         }
     };
 }
@@ -15,13 +24,8 @@ macro_rules! py_run {
 fn main() {
     let py_vars = py_vars { ..Default::default() };
 
-    py_run! {
-        &py_vars,
-        x = 2
-    };
-
-    py_run! {
-        &py_vars,
-        print(x)
+    python_string! {&py_vars,
+        "x = 2
+print(x)"
     };
 }
