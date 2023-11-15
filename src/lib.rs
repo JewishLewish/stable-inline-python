@@ -1,19 +1,28 @@
+use std::default;
+
 use pyo3::{prelude::*, types::PyDict};
 
-#[macro_export]
-macro_rules! py_run {
-    ($code:expr) => {
-        use crate::lib::execute_python;
-        let code_str = stringify!($code);
-        let _ = execute_python(code_str);
-    };
+
+pub struct py_vars {
+    pub locals: Py<PyDict>
 }
 
-pub fn execute_python(input: &'static str) -> PyResult<()> {
+impl  Default for py_vars {
+    fn default() -> Self {
+        pyo3::prepare_freethreaded_python();
+        Python::with_gil(|py| {
+            Self { locals: PyDict::new(py).into() }
+        })
+    }
+}
+
+
+
+pub fn execute_python(py_vars: &py_vars, input: &'static str) -> PyResult<()> {
     pyo3::prepare_freethreaded_python();
 
     Python::with_gil(|py| {
-            let locals = PyDict::new(py);
+            let locals = &py_vars.locals.as_ref(py);
             // Read Python code from user input
 
             // Execute the entered Python code
