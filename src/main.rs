@@ -1,13 +1,10 @@
-mod lib;
-
-use crate::lib::*;
-
+use stable_inline_rs::PyContext;
 
 
 fn main() {
-    let c = PyContext { ..Default::default() };
+    let c = PyContext::new();
 
     c.run("x=2");
-    let x = c.get::<i32>("x");
+    let x = c.get::<String>("x");
     print!("{}",x.unwrap());
 }

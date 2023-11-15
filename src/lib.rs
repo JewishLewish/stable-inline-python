@@ -24,7 +24,7 @@ macro_rules! python {
 }
 
 pub struct PyContext {
-    pub variables: py_var
+    pub variables: PyVar
 }
 
 impl Default for PyContext {
@@ -34,11 +34,11 @@ impl Default for PyContext {
 }
 
 
-pub struct py_var {
+pub struct PyVar {
     pub locals: Py<PyDict>
 }
 
-impl Default for py_var {
+impl Default for PyVar {
     fn default() -> Self {
         pyo3::prepare_freethreaded_python();
         Python::with_gil(|py| {
@@ -46,8 +46,6 @@ impl Default for py_var {
         })
     }
 }
-
-pub struct SingleGen<T>(T);
 
 impl PyContext {
     pub fn new() -> PyContext {
@@ -71,7 +69,7 @@ impl PyContext {
         out.parse::<T>()
     }
 
-    fn execute_python(&self, py_vars: Option<&py_var>, input: &'static str) -> PyResult<()> {
+    fn execute_python(&self, py_vars: Option<&PyVar>, input: &'static str) -> PyResult<()> {
         pyo3::prepare_freethreaded_python();
     
         Python::with_gil(|py| {
@@ -83,7 +81,7 @@ impl PyContext {
         Ok(())
     }
 
-    fn _define<'a>(&self, py_vars: Option<&'a py_var>, py: Python<'a>) -> &'a PyDict {
+    fn _define<'a>(&self, py_vars: Option<&'a PyVar>, py: Python<'a>) -> &'a PyDict {
         if py_vars.is_none() {
             PyDict::new(py).into()
         } else {
