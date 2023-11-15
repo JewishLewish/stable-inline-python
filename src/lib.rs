@@ -1,7 +1,15 @@
 use pyo3::{prelude::*, types::PyDict};
-use std::io::{self, Write};
 
-fn execute_python(input: &'static str) -> PyResult<()> {
+#[macro_export]
+macro_rules! py_run {
+    ($code:expr) => {
+        use crate::lib::execute_python;
+        let code_str = stringify!($code);
+        let _ = execute_python(code_str);
+    };
+}
+
+pub fn execute_python(input: &'static str) -> PyResult<()> {
     pyo3::prepare_freethreaded_python();
 
     Python::with_gil(|py| {
@@ -18,10 +26,3 @@ fn execute_python(input: &'static str) -> PyResult<()> {
     Ok(())
 }
 
-
-macro_rules! py_run {
-    ($code:expr) => {
-        let code_str = stringify!($code);
-        let _ = execute_python(code_str);
-    };
-}

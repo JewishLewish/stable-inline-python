@@ -1,5 +1,4 @@
-use pyo3::{prelude::*, types::PyDict};
-use std::io::{self, Write};
+mod lib;
 
 
 fn main() {
