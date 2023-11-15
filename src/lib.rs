@@ -1,4 +1,4 @@
-use std::default;
+use std::{default, str::FromStr};
 
 use pyo3::{prelude::*, types::PyDict};
 
@@ -14,7 +14,8 @@ macro_rules! py_run {
     };
 }
 
-macro_rules! python_string {
+#[macro_export]
+macro_rules! python {
     ($py_vars:expr, $code:expr) => {
         {
             let _ = execute_python($py_vars, $code);
@@ -46,14 +47,30 @@ impl Default for py_var {
     }
 }
 
+pub struct SingleGen<T>(T);
+
 impl py_context {
-    fn new() -> py_context {
+    pub fn new() -> py_context {
         py_context { ..Default::default() }
     }
 
-    fn run(&self, input: &'static str) -> PyResult<()> {
-        execute_python(Some(&self.variables), input)
+    pub fn run(&self, input: &'static str) {
+        let _ = execute_python(Some(&self.variables), input);
     }
+     
+    pub fn get<T: FromStr>(&self, input: &'static str) -> Result<T, <T as FromStr>::Err> {
+
+        pyo3::prepare_freethreaded_python();
+
+        let out = Python::with_gil(|py| {
+            let locals: &PyDict = _define(Some(&self.variables), py);
+            
+            let ret = locals.get_item(input).unwrap().unwrap();
+            format!("{}",ret)
+        });
+        out.parse::<T>()
+    }
+
 }
 
 
@@ -64,13 +81,7 @@ pub fn execute_python(py_vars: Option<&py_var>, input: &'static str) -> PyResult
     Python::with_gil(|py| {
         let locals: &PyDict = _define(py_vars, py);
         
-        // Read Python code from user input
-
-        // Execute the entered Python code
         let _ = py.run(&input, None, Some(locals)).unwrap();
-
-        //let ret = locals.get_item("x").unwrap().unwrap();
-        //print!("{:?}",ret);
     });
 
     Ok(())
