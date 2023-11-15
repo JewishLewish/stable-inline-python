@@ -1,4 +1,4 @@
-use std::{default, str::FromStr};
+use std::str::FromStr;
 
 use pyo3::{prelude::*, types::PyDict};
 
@@ -55,7 +55,7 @@ impl PyContext {
     }
 
     pub fn run(&self, input: &'static str) {
-        let _ = execute_python(Some(&self.variables), input);
+        let _ = self.execute_python(Some(&self.variables), input);
     }
      
     pub fn get<T: FromStr>(&self, input: &'static str) -> Result<T, <T as FromStr>::Err> {
@@ -63,7 +63,7 @@ impl PyContext {
         pyo3::prepare_freethreaded_python();
 
         let out = Python::with_gil(|py| {
-            let locals: &PyDict = _define(Some(&self.variables), py);
+            let locals: &PyDict = self._define(Some(&self.variables), py);
             
             let ret = locals.get_item(input).unwrap().unwrap();
             format!("{}",ret)
@@ -71,26 +71,24 @@ impl PyContext {
         out.parse::<T>()
     }
 
-}
-
-
-
-pub fn execute_python(py_vars: Option<&py_var>, input: &'static str) -> PyResult<()> {
-    pyo3::prepare_freethreaded_python();
-
-    Python::with_gil(|py| {
-        let locals: &PyDict = _define(py_vars, py);
-        
-        let _ = py.run(&input, None, Some(locals)).unwrap();
-    });
-
-    Ok(())
-}
-
-fn _define<'a>(py_vars: Option<&'a py_var>, py: Python<'a>) -> &'a PyDict {
-    if py_vars.is_none() {
-        PyDict::new(py).into()
-    } else {
-        py_vars.unwrap().locals.as_ref(py)
+    fn execute_python(&self, py_vars: Option<&py_var>, input: &'static str) -> PyResult<()> {
+        pyo3::prepare_freethreaded_python();
+    
+        Python::with_gil(|py| {
+            let locals: &PyDict = self._define(py_vars, py);
+            
+            let _ = py.run(&input, None, Some(locals)).unwrap();
+        });
+    
+        Ok(())
     }
+
+    fn _define<'a>(&self, py_vars: Option<&'a py_var>, py: Python<'a>) -> &'a PyDict {
+        if py_vars.is_none() {
+            PyDict::new(py).into()
+        } else {
+            py_vars.unwrap().locals.as_ref(py)
+        }
+    }
+    
 }
