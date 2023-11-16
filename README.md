@@ -3,7 +3,7 @@ Stable Ver. of Inline Rust
 
 # QuickStart
 ```rust
-use stable_inline_rs::PyContext;
+use stable_inline_python::PyContext;
 
 
 fn main() {

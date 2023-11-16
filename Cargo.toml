@@ -1,9 +1,15 @@
 [package]
-name = "stable-inline-rs"
+name = "stable-inline-python"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Stable Variant of inline-python."
+readme = "README.md"
+keywords = ["python", "inline", "embed", "macro"]
+repository = "https://github.com/fusion-engineering/inline-python"
+license = "BSD-2-Clause"
+authors = [
+	"Lennard B. <lanbrokhman@gmail.com>"
+]
 
 [dependencies]
-pyo3 = "0.20.0"
+pyo3 = {version ="0.20.0", default-features = false, features = ["auto-initialize"] }
