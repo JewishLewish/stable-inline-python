@@ -43,7 +43,7 @@ impl PyContext {
     ///
     /// * `input` - A string containing the Python code to execute.
     pub fn run(&self, input: &str) {
-        let _ = self.execute_python(Some(&self.variables), input);
+        let _ = self.execute_python(Some(&self.variables), &input);
     }
 
     /// Executes Python code from a file specified by `file`.
@@ -56,7 +56,7 @@ impl PyContext {
     ///
     /// Returns an error if there is an issue reading the file or executing Python code.
     pub fn run_file(&self, file: &str) -> Result<(), PyErr> {
-        let contents = fs::read_to_string(file)?;
+        let contents = fs::read_to_string(&file)?;
         self.execute_python(Some(&self.variables), &contents)
     }
      
@@ -75,9 +75,9 @@ impl PyContext {
         pyo3::prepare_freethreaded_python();
 
         let out = Python::with_gil(|py| {
-            let locals: &PyDict = self._define(Some(&self.variables), py);
+            let locals: &PyDict = self._define(Some(&self.variables), &py);
             
-            let ret = locals.get_item(input).unwrap().unwrap();
+            let ret = locals.get_item(&input).unwrap().unwrap();
             format!("{}",ret)
         });
         out.parse::<T>()
@@ -87,7 +87,7 @@ impl PyContext {
         pyo3::prepare_freethreaded_python();
     
         Python::with_gil(|py| {
-            let locals: &PyDict = self._define(py_vars, py);
+            let locals: &PyDict = self._define(py_vars, &py);
             
             let _ = py.run(&input, None, Some(locals)).unwrap();
         });
@@ -105,11 +105,11 @@ impl PyContext {
     /// # Returns
     ///
     /// A reference to a Python dictionary containing the defined variables.
-    fn _define<'a>(&self, py_vars: Option<&'a PyVar>, py: Python<'a>) -> &'a PyDict {
+    fn _define<'a>(&self, py_vars: Option<&'a PyVar>, py: &Python<'a>) -> &'a PyDict {
         if py_vars.is_none() {
-            PyDict::new(py).into()
+            PyDict::new(*py).into()
         } else {
-            py_vars.unwrap().locals.as_ref(py)
+            py_vars.unwrap().locals.as_ref(*py)
         }
     }
     
