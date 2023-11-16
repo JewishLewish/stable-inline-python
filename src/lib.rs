@@ -42,8 +42,8 @@ impl PyContext {
     /// # Arguments
     ///
     /// * `input` - A string containing the Python code to execute.
-    pub fn run(&self, input: &str) {
-        let _ = self.execute_python(Some(&self.variables), &input);
+    pub fn run(&self, input: &str) -> Result<(), pyo3::PyErr> {
+        self.execute_python(Some(&self.variables), &input)
     }
 
     /// Executes Python code from a file specified by `file`.
@@ -83,16 +83,13 @@ impl PyContext {
         out.parse::<T>()
     }
 
-    fn execute_python(&self, py_vars: Option<&PyVar>, input: &str) -> PyResult<()> {
+    fn execute_python(&self, py_vars: Option<&PyVar>, input: &str) -> Result<(), pyo3::PyErr> {
         pyo3::prepare_freethreaded_python();
     
         Python::with_gil(|py| {
             let locals: &PyDict = self._define(py_vars, &py);
-            
-            let _ = py.run(&input, None, Some(locals)).unwrap();
-        });
-    
-        Ok(())
+            py.run(&input, None, Some(locals))
+        })
     }
 
     /// Defines Python variables for execution.
