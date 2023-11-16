@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{str::FromStr, fs};
 
 use pyo3::{prelude::*, types::PyDict};
 
@@ -32,8 +32,13 @@ impl PyContext {
         PyContext { ..Default::default() }
     }
 
-    pub fn run(&self, input: &'static str) {
+    pub fn run(&self, input: &str) {
         let _ = self.execute_python(Some(&self.variables), input);
+    }
+
+    pub fn run_file(&self, file:&str) {
+        let contents = fs::read_to_string(&file).unwrap();
+        let _ = self.execute_python(Some(&self.variables), &contents);
     }
      
     pub fn get<T: FromStr>(&self, input: &'static str) -> Result<T, <T as FromStr>::Err> {
@@ -49,7 +54,7 @@ impl PyContext {
         out.parse::<T>()
     }
 
-    fn execute_python(&self, py_vars: Option<&PyVar>, input: &'static str) -> PyResult<()> {
+    fn execute_python(&self, py_vars: Option<&PyVar>, input: &str) -> PyResult<()> {
         pyo3::prepare_freethreaded_python();
     
         Python::with_gil(|py| {
