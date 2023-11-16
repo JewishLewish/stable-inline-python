@@ -4,7 +4,7 @@ fn main() {
     
     let c = PyContext::new();
 
-    c.run_file("test.py");
+    let _ = c.run_file("test.py");
 
     c.run("hi()");
 }
