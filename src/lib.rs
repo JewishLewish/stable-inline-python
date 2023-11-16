@@ -3,26 +3,6 @@ use std::str::FromStr;
 use pyo3::{prelude::*, types::PyDict};
 
 
-#[macro_export]
-macro_rules! py_run {
-    ($py_vars:expr, $($code:tt)*) => {
-        {
-            println!("{:?}",$($code)*);
-            let code_str = stringify!($($code)*);
-            let _ = execute_python($py_vars, code_str);
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! python {
-    ($py_vars:expr, $code:expr) => {
-        {
-            let _ = execute_python($py_vars, $code);
-        }
-    };
-}
-
 pub struct PyContext {
     pub variables: PyVar
 }
