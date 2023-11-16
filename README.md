@@ -1,4 +1,4 @@
-# stable-inline-rs
+# stable-inline-python
 Stable Ver. of Inline Rust
 
 # QuickStart
