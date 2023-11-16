@@ -5,7 +5,7 @@ edition = "2021"
 description = "Stable Variant of inline-python."
 readme = "README.md"
 keywords = ["python", "inline", "embed", "macro"]
-repository = "https://github.com/fusion-engineering/inline-python"
+repository = "https://github.com/JewishLewish/stable-inline-python"
 license = "BSD-2-Clause"
 authors = [
 	"Lennard B. <lanbrokhman@gmail.com>"
