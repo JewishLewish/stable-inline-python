@@ -1,8 +1,6 @@
 use std::{str::FromStr, fs};
 
 use pyo3::{prelude::*, types::PyDict};
-
-
 pub struct PyContext {
     pub variables: PyVar
 }
@@ -12,7 +10,6 @@ impl Default for PyContext {
         PyContext { variables: Default::default() }
     }
 }
-
 
 pub struct PyVar {
     pub locals: Py<PyDict>
@@ -36,9 +33,9 @@ impl PyContext {
         let _ = self.execute_python(Some(&self.variables), input);
     }
 
-    pub fn run_file(&self, file:&str) {
-        let contents = fs::read_to_string(&file).unwrap();
-        let _ = self.execute_python(Some(&self.variables), &contents);
+    pub fn run_file(&self, file: &str) -> Result<(), PyErr> {
+        let contents = fs::read_to_string(file)?;
+        self.execute_python(Some(&self.variables), &contents)
     }
      
     pub fn get<T: FromStr>(&self, input: &'static str) -> Result<T, <T as FromStr>::Err> {
