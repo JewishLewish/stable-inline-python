@@ -2,6 +2,20 @@ use std::{str::FromStr, fs};
 
 use pyo3::{prelude::*, types::PyDict};
 
+#[macro_export]
+macro_rules! py_eval {
+    ($val:expr) => {
+        {
+            use pyo3::prelude::*;
+            pyo3::prepare_freethreaded_python();
+
+            Python::with_gil(|py| {
+                py.run($val, None, None)
+            })
+        }
+    };
+}
+
 /// Represents a context for executing Python code.
 pub struct PyContext {
     /// Stores Python variables and their values.
@@ -35,6 +49,7 @@ impl PyContext {
     /// Constructs a new empty `PyContext`.
     pub fn new() -> PyContext {
         PyContext { ..Default::default() }
+        
     }
 
     /// Executes Python code provided as input.
